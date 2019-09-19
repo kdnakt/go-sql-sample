@@ -38,6 +38,7 @@ func TestRepo_FindUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer mockdb.Close()
 
 	ctx := context.Background()
 	repo := NewRepo(mockdb)
@@ -64,6 +65,36 @@ func TestRepo_FindUser(t *testing.T) {
 	}
 	if got2 != nil {
 		t.Errorf("Expected: nil, but got: %v", got2)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("mock has error %v", err)
+	}
+}
+
+func TestRepo_AddUser(t *testing.T) {
+	mockdb, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer mockdb.Close()
+
+	ctx := context.Background()
+	repo := NewRepo(mockdb)
+
+	mock.ExpectExec(`
+		INSERT INTO user
+	`).WithArgs(
+		o.ID,
+		o.Name,
+		o.Email,
+		o.CreatedAt,
+		o.UpdatedAt,
+	)
+
+	addErr := repo.AddUser(ctx, &o)
+	if addErr != nil {
+		t.Error(addErr)
 	}
 
 	if err := mock.ExpectationsWereMet(); err != nil {
