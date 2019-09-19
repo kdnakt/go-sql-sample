@@ -46,6 +46,10 @@ func TestRepo_FindUser(t *testing.T) {
 		SELECT id, name, email, created_at, updated_at FROM user WHERE id = ?
 	`).WithArgs(o.ID).WillReturnRows(existRows())
 
+	mock.ExpectQuery(`
+		SELECT id, name, email, created_at, updated_at FROM user WHERE id = ?
+	`).WithArgs(unknownID).WillReturnRows(sqlmock.NewRows([]string{}))
+
 	got, err := repo.FindUser(ctx, o.ID)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
