@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -46,8 +47,22 @@ func TestRepo_FindUser(t *testing.T) {
 	`).WithArgs(o.ID).WillReturnRows(existRows())
 
 	got, err := repo.FindUser(ctx, o.ID)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if !reflect.DeepEqual(o, got) {
+		t.Errorf("Expected: %v, but got: %v", o, got)
+	}
 
-	if mock.ExpectationsWereMet() != nil {
+	got2, err := repo.FindUser(ctx, unknownID)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if got2 != nil {
+		t.Errorf("Expected: nil, but got: %v", got2)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("mock has error %v", err)
 	}
 }
