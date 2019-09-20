@@ -55,7 +55,7 @@ func TestRepo_FindUser(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if !reflect.DeepEqual(o, got) {
+	if !reflect.DeepEqual(&o, got) {
 		t.Errorf("Expected: %v, but got: %v", o, got)
 	}
 
