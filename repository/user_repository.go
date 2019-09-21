@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/kdnakt/go-sql-sample/entity"
 )
@@ -37,5 +38,28 @@ func (repo *Repo) FindUser(ctx context.Context, id int64) (*entity.User, error) 
 
 // AddUser adds user to repository
 func (repo *Repo) AddUser(ctx context.Context, u *entity.User) error {
+	conn, err := repo.db.Conn(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	now := time.Now()
+	res, err := conn.ExecContext(ctx, `
+		INSERT INTO user (name, email, created_at, updated_at)
+		VALUES (?, ?, ?, ?)
+	`, u.Name, u.Email, now, now,
+	)
+	if err != nil {
+		return err
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	u.ID = id
+	u.CreatedAt = now
+	u.UpdatedAt = now
 	return nil
 }

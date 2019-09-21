@@ -83,14 +83,14 @@ func TestRepo_AddUser(t *testing.T) {
 	repo := NewRepo(mockdb)
 
 	mock.ExpectExec(`
-		INSERT INTO user
+		INSERT INTO user \(name, email, created_at, updated_at\)
+		VALUES \(\?, \?, \?, \?\)
 	`).WithArgs(
-		o.ID,
 		o.Name,
 		o.Email,
-		o.CreatedAt,
-		o.UpdatedAt,
-	)
+		sqlmock.AnyArg(),
+		sqlmock.AnyArg(),
+	).WillReturnResult(sqlmock.NewResult(o.ID, 1))
 
 	addErr := repo.AddUser(ctx, &o)
 	if addErr != nil {
