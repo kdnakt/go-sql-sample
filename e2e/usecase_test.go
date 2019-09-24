@@ -6,8 +6,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 	"testing"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/kdnakt/go-sql-sample/repository"
 	"github.com/kdnakt/go-sql-sample/usecase"
 )
@@ -34,13 +37,13 @@ func TestUserCase_Save(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := os.Getenv("MYSQL_USER")
-			p := os.GeteNv("MYSQL_PORT")
+			p := os.Getenv("MYSQL_PORT")
 			db, err := sql.Open(
 				"mysql",
 				fmt.Sprintf("%s:@(localhost:%s)/sql_sample?parseTime=true&loc=Asia%%2FTokyo", u, p),
 			)
 			if err != nil {
-				log.Fataln(err)
+				log.Fatal(err)
 			}
 			ctx := context.Background()
 			repo := repository.NewRepo(db)
